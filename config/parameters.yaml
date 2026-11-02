@@ -1,0 +1,107 @@
+# Haplotype Mapper — canonical parameter registry
+#
+# HUMAN-TUNED: a person may change the value between recorded runs.
+# FIXED DURING RUN: neither the LLM nor graph may alter the value after loading.
+# AGENT-SELECTABLE: the LLM may select an exact pre-approved entry, never edit it.
+
+pipeline:
+  # Operational profile. Real-evidence runners switch a recorded copy to `real`.
+  mode: mock  # HUMAN-TUNED; FIXED DURING RUN.
+
+  whatshap:
+    # Baseline WhatsHap 2.8 polyphase settings. All are FIXED DURING RUN.
+    executable: whatshap          # Program name or absolute executable path.
+    ploidy: 4                     # Must match genotype ploidy in the input VCF.
+    block_cut_sensitivity: 4      # 0–5; lower can join blocks with more error risk.
+    use_reference: true           # Include --reference when building the command.
+    tag: PS                       # Write PS phase-set tags; alternative is HP.
+    mapping_quality: 20           # Ignore alignments below this mapping quality.
+    threads: 1                    # CPU threads allocated to one polyphase run.
+    only_snvs: false              # If true, exclude non-SNV variants from phasing.
+    ignore_read_groups: false     # If true, do not use BAM read-group sample mapping.
+    include_haploid_sets: false   # Include haploid phase sets in output when true.
+    distrust_genotypes: false     # FIXED OFF: active retries may not change genotype calls.
+    use_prephasing: false         # Use phase information already present in the VCF.
+    min_overlap: 2                # Minimum overlap used when merging phase blocks.
+    no_mav: false                 # Disable multi-allelic variant handling when true.
+    use_supplementary: false      # Include supplementary alignments when true.
+    supplementary_distance: 100000  # Maximum supplementary-alignment distance.
+
+  gatk:
+    # These values record the real manual pipeline and feed dry-run plans only.
+    executable: gatk                 # GATK launcher; FIXED DURING RUN.
+    haplotype_caller:
+      sample_ploidy: 4            # Ploidy used by HaplotypeCaller.
+      emit_reference_confidence: GVCF  # Produce a GVCF for later genotyping.
+
+    genotype_gvcfs:
+      # OPEN PROVENANCE QUESTION: null omits --sample-ploidy from the plan.
+      # The real header reports GATK's resolved default 2, while output GTs have
+      # four alleles. Do not change this until the representation is reviewed.
+      sample_ploidy: null          # INACTIVE / PENDING REVIEW; not agent-selectable.
+      include_non_variant_sites: false  # Emit variant sites only.
+
+    hard_filters:
+      # A record fails when it crosses the boundary shown in each comment.
+      minimum_qd: 2.0             # Fail when QD < 2.0.
+      minimum_qual: 30.0          # Fail when QUAL < 30.0.
+      maximum_sor: 3.0            # Fail when SOR > 3.0.
+      maximum_fs: 60.0            # Fail when FS > 60.0.
+      minimum_mq: 40.0            # Fail when MQ < 40.0.
+      minimum_mq_rank_sum: -12.5  # Fail when MQRankSum < -12.5.
+      minimum_read_pos_rank_sum: -8.0  # Fail when ReadPosRankSum < -8.0.
+
+    post_filter_selection:
+      executable: bcftools         # bcftools launcher; FIXED DURING RUN.
+      require_pass: true          # Keep only records whose FILTER value is PASS.
+      minimum_alleles: 2          # Minimum number of REF+ALT alleles retained.
+      maximum_alleles: 2          # Maximum number; 2 keeps biallelic records only.
+      snps_only: true              # Keep SNPs and remove indels/other variant types.
+
+  # Active phasing-only research intervention, not scientifically validated.
+  # Exact overrides on the frozen baseline; selected only under retry_policy.md.
+  retry_strategies:
+    - strategy_id: lower-block-cut-sensitivity-v1
+      parameters:
+        block_cut_sensitivity: 2
+
+agent:
+  model:
+    provider: ollama              # HUMAN-TUNED model service/provider.
+    name: qwen2.5:7b              # HUMAN-TUNED model identifier.
+    temperature: 0                # Sampling randomness; 0 requests stable output.
+    required_environment_variables: []  # Credential variable names, never values.
+    options:
+      keep_alive: 30m             # Keep the local model loaded between region calls.
+      num_ctx: 8192               # Research context allowance for Skills and bounded retry history.
+
+  decisions:
+    # The three actions are FIXED by the research design, not tuning options.
+    allowed_actions: [accept, retry, escalate]
+    max_retries: 2                # Maximum alternative attempts before escalation.
+    minimum_confidence: null      # Optional gate; null preserves action-only routing.
+
+  static_baseline:
+    name: unconfigured-static-baseline  # Comparator identity stored in audit logs.
+    version: 0.0.0-placeholder          # Version the eventual fixed-rule definition.
+    fallback_action: escalate           # Used when no static rule matches.
+    fallback_confidence: 1.0            # Confidence recorded for that fallback.
+
+paths:
+  # Project locations, not scientific tuning parameters.
+  skills_directory: agent/skills
+  output_directory: outputs
+
+execution:
+  # Operational safeguards; they affect runtime, not biological interpretation.
+  graph_base_steps: 8             # LangGraph steps available before retry expansion.
+  graph_steps_per_retry: 3        # Additional graph steps reserved for each retry.
+  real_smoke_progress_every: 10   # Print progress after this many real regions.
+  whatshap_retry_timeout_seconds: 120  # Operational time limit per sample/strategy, not a biological threshold.
+
+evaluation:
+  consistency_repetitions: 3      # Repeated identical model calls per trial case.
+
+analysis:
+  # Exploratory only; never supplied to the agent or used for graph routing.
+  high_frequency_threshold: 0.5   # Notebook definition of a high-frequency haplotype.

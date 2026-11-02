@@ -1,0 +1,2 @@
+batch_id,sample_id,bam,bam_index,phased_vcf,vcf_index,reference_fasta,reference_fai,reference_dictionary
+artificial-batch,ARTIFICIAL_SAMPLE,/path/to/inputs/ARTIFICIAL_SAMPLE.md.bam,/path/to/inputs/ARTIFICIAL_SAMPLE.md.bam.bai,/path/to/inputs/ARTIFICIAL_SAMPLE.phased.vcf.gz,/path/to/inputs/ARTIFICIAL_SAMPLE.phased.vcf.gz.tbi,/path/to/reference/assembly.fa,/path/to/reference/assembly.fa.fai,/path/to/reference/assembly.dict

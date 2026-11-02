@@ -1,0 +1,16 @@
+{
+  "purpose": "isolated_real_whats_hap_retry_mechanics_test",
+  "validation_status": "unvalidated_mechanics_test_only",
+  "scientifically_approved": false,
+  "eligible_for_real_evaluation": false,
+  "execution_scope": "sample_wide_cached_per_exact_strategy",
+  "artifact_policy": "immutable_attempt_scoped_no_merge",
+  "strategy": {
+    "strategy_id": "unvalidated-mechanics-lower-block-cut-sensitivity-v1",
+    "parameters": {
+      "block_cut_sensitivity": 2,
+      "validation_status": "unvalidated_mechanics_test_only",
+      "scientifically_approved": false
+    }
+  }
+}
