@@ -179,17 +179,4 @@ they construct argument vectors without executing them.
 
 This is a software release, not an exact thesis reproduction bundle. The original
 biological data, derived catalogues, manifests, frozen panels, saved model responses,
-run plans and outputs are deliberately omitted. Historical hashes, exclusion rules,
-seeds and model settings remain in code; they do not recreate missing artifacts.
-Resuming old runs may require their exact paths and configuration fingerprints.
-
-Real evidence has no per-sample action ground truth. Population simulation supplies
-genotype truth only, and artificial test labels establish mechanics only. Regional
-statistics must not be replaced with file-wide values. Retry rules are unvalidated;
-short reads cannot supply absent linkage. The GATK GenotypeGVCFs ploidy provenance
-question remains unresolved: its plan omits `--sample-ploidy` (null), while
-HaplotypeCaller uses 4. No scientific settings were retuned for this release.
-
-Verification uses artificial inputs and copied, isolated installed dependencies.
-Real pipelines, model inference, public-data preprocessing, and fresh dependency
-resolution require separate validation by the researcher.
+run plans and outputs are deliberately omitted.
